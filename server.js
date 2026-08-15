@@ -5,7 +5,7 @@ const multer = require("multer");
 const session = require("express-session");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 
 // ========================================
@@ -990,13 +990,10 @@ app.delete(
 // START SERVER
 // ========================================
 
-app.listen(
-    PORT,
-    () => {
+app.listen(PORT, "0.0.0.0", () => {
 
-        console.log(
-            `MovieHub running at http://localhost:${PORT}`
-        );
+    console.log(
+        `MovieHub running on port ${PORT}`
+    );
 
-    }
-);
+});
