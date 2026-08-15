@@ -1,0 +1,29 @@
+[
+  {
+    "id": "1786557586496",
+    "name": "ram",
+    "category": "Action",
+    "year": "2027",
+    "description": "nice movie",
+    "poster": "/posters/1786557586430.png",
+    "video": "/videos/1786557586440.mp4"
+  },
+  {
+    "id": "1786673297984",
+    "name": "reacher",
+    "category": "Sci-Fi",
+    "year": "2020",
+    "description": "reacher hollywood movie",
+    "poster": "/posters/1786673297897.png",
+    "video": "/videos/1786673297911.mp4"
+  },
+  {
+    "id": "1786756057504",
+    "name": "halowwwen",
+    "category": "Thriller",
+    "year": "2021",
+    "description": "nice horror movie",
+    "poster": "/posters/1786756057416.png",
+    "video": "/videos/1786756057430.mp4"
+  }
+]

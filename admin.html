@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>MovieHub Admin</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<header class="navbar">
+
+    <div class="logo">
+        Movie<span>Hub</span>
+    </div>
+
+    <nav>
+        <a href="index.html">
+            Website
+        </a>
+    </nav>
+
+</header>
+
+
+
+<main class="admin-page">
+
+
+    <h1>
+        Add New Movie
+    </h1>
+
+
+    <p class="admin-subtitle">
+        Add movie information to your MovieHub library.
+    </p>
+
+
+
+    <!-- ================================= -->
+    <!-- ADD MOVIE FORM -->
+    <!-- ================================= -->
+
+    <form
+        id="movieForm"
+        enctype="multipart/form-data"
+    >
+
+
+        <label for="movieName">
+            Movie Name
+        </label>
+
+
+        <input
+            type="text"
+            id="movieName"
+            name="name"
+            placeholder="Enter movie name"
+            required
+        >
+
+
+
+        <label for="movieCategory">
+            Category
+        </label>
+
+
+        <select
+            id="movieCategory"
+            name="category"
+            required
+        >
+
+            <option value="Action">
+                Action
+            </option>
+
+            <option value="Comedy">
+                Comedy
+            </option>
+
+            <option value="Drama">
+                Drama
+            </option>
+
+            <option value="Horror">
+                Horror
+            </option>
+
+            <option value="Thriller">
+                Thriller
+            </option>
+
+            <option value="Sci-Fi">
+                Sci-Fi
+            </option>
+
+        </select>
+
+
+
+        <label for="movieYear">
+            Release Year
+        </label>
+
+
+        <input
+            type="number"
+            id="movieYear"
+            name="year"
+            placeholder="2026"
+            required
+        >
+
+
+
+        <label for="poster">
+            Poster Image
+        </label>
+
+
+        <input
+            type="file"
+            id="poster"
+            name="poster"
+            accept="image/*"
+            required
+        >
+
+
+
+        <label for="video">
+            Movie Video
+        </label>
+
+
+        <input
+            type="file"
+            id="video"
+            name="video"
+            accept="video/*"
+            required
+        >
+
+
+
+        <label for="movieDescription">
+            Description
+        </label>
+
+
+        <textarea
+            id="movieDescription"
+            name="description"
+            placeholder="Write movie description..."
+            rows="5"
+            required
+        ></textarea>
+
+
+
+        <button
+            type="submit"
+            class="watch-btn"
+        >
+            + Add Movie
+        </button>
+
+
+    </form>
+
+
+
+    <hr style="margin:40px 0;">
+
+
+
+    <!-- ================================= -->
+    <!-- EDIT MOVIE FORM -->
+    <!-- ================================= -->
+
+    <div
+        id="editMovieBox"
+        style="display:none;"
+    >
+
+
+        <h2>
+            ✏️ Edit Movie
+        </h2>
+
+
+        <p class="admin-subtitle">
+            Change movie information below.
+        </p>
+
+
+        <form
+            id="editMovieForm"
+            enctype="multipart/form-data"
+        >
+
+
+            <input
+                type="hidden"
+                id="editMovieId"
+            >
+
+
+
+            <label>
+                Movie Name
+            </label>
+
+
+            <input
+                type="text"
+                id="editMovieName"
+                name="name"
+                required
+            >
+
+
+
+            <label>
+                Category
+            </label>
+
+
+            <select
+                id="editMovieCategory"
+                name="category"
+                required
+            >
+
+                <option value="Action">
+                    Action
+                </option>
+
+                <option value="Comedy">
+                    Comedy
+                </option>
+
+                <option value="Drama">
+                    Drama
+                </option>
+
+                <option value="Horror">
+                    Horror
+                </option>
+
+                <option value="Thriller">
+                    Thriller
+                </option>
+
+                <option value="Sci-Fi">
+                    Sci-Fi
+                </option>
+
+            </select>
+
+
+
+            <label>
+                Release Year
+            </label>
+
+
+            <input
+                type="number"
+                id="editMovieYear"
+                name="year"
+                required
+            >
+
+
+
+            <label>
+                New Poster
+                <small>
+                    (optional)
+                </small>
+            </label>
+
+
+            <input
+                type="file"
+                id="editPoster"
+                name="poster"
+                accept="image/*"
+            >
+
+
+
+            <label>
+                New Video
+                <small>
+                    (optional)
+                </small>
+            </label>
+
+
+            <input
+                type="file"
+                id="editVideo"
+                name="video"
+                accept="video/*"
+            >
+
+
+
+            <label>
+                Description
+            </label>
+
+
+            <textarea
+                id="editMovieDescription"
+                name="description"
+                rows="5"
+                required
+            ></textarea>
+
+
+
+            <button
+                type="submit"
+                class="watch-btn"
+            >
+                💾 Save Changes
+            </button>
+
+
+            <button
+                type="button"
+                class="watch-btn"
+                onclick="cancelEdit()"
+            >
+                ✖ Cancel
+            </button>
+
+
+        </form>
+
+
+    </div>
+
+
+
+    <hr style="margin:40px 0;">
+
+
+
+    <!-- ================================= -->
+    <!-- MANAGE MOVIES -->
+    <!-- ================================= -->
+
+
+    <h2>
+        Manage Movies
+    </h2>
+
+
+    <p class="admin-subtitle">
+        Edit or delete movies from your MovieHub library.
+    </p>
+
+
+
+    <div id="adminMovieList">
+
+        <p>
+            Loading movies...
+        </p>
+
+    </div>
+
+
+</main>
+
+
+
+<script>
+
+
+// ========================================
+// ADD MOVIE
+// ========================================
+
+document
+    .getElementById("movieForm")
+    .addEventListener(
+        "submit",
+        async function(event) {
+
+            event.preventDefault();
+
+
+            const form =
+                document.getElementById(
+                    "movieForm"
+                );
+
+
+            const formData =
+                new FormData(form);
+
+
+            try {
+
+
+                const response =
+                    await fetch(
+                        "/api/movies",
+                        {
+                            method: "POST",
+                            body: formData
+                        }
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                if (result.success) {
+
+
+                    alert(
+                        "Movie successfully added! 🎬"
+                    );
+
+
+                    form.reset();
+
+
+                    loadAdminMovies();
+
+
+                } else {
+
+
+                    alert(
+                        result.message ||
+                        "Movie add nahi hui."
+                    );
+
+                }
+
+
+            } catch (error) {
+
+
+                console.error(error);
+
+
+                alert(
+                    "Server se connection nahi ho raha."
+                );
+
+            }
+
+        }
+    );
+
+
+
+// ========================================
+// LOAD MOVIES
+// ========================================
+
+async function loadAdminMovies() {
+
+
+    const movieList =
+        document.getElementById(
+            "adminMovieList"
+        );
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                "/api/movies"
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "API error"
+            );
+
+        }
+
+
+        const movies =
+            await response.json();
+
+
+        movieList.innerHTML = "";
+
+
+        if (
+            !Array.isArray(movies) ||
+            movies.length === 0
+        ) {
+
+
+            movieList.innerHTML =
+                "<p>No movies added yet.</p>";
+
+
+            return;
+
+        }
+
+
+
+        movies.forEach(movie => {
+
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+
+            item.style.marginBottom =
+                "20px";
+
+
+            item.style.padding =
+                "15px";
+
+
+            item.style.border =
+                "1px solid #555";
+
+
+            item.style.borderRadius =
+                "10px";
+
+
+
+            item.innerHTML = `
+
+                <h3>
+                    ${movie.name}
+                </h3>
+
+                <p>
+                    ${movie.category}
+                    •
+                    ${movie.year}
+                </p>
+
+                <div
+                    style="
+                        display:flex;
+                        gap:10px;
+                        flex-wrap:wrap;
+                    "
+                >
+
+                    <button
+                        class="watch-btn"
+                        type="button"
+                        onclick="editMovie(${movie.id})"
+                    >
+                        ✏️ Edit Movie
+                    </button>
+
+
+                    <button
+                        class="watch-btn"
+                        type="button"
+                        onclick="deleteMovie(${movie.id})"
+                    >
+                        🗑️ Delete Movie
+                    </button>
+
+                </div>
+
+            `;
+
+
+            movieList.appendChild(
+                item
+            );
+
+        });
+
+
+    } catch (error) {
+
+
+        console.error(
+            "Admin movie loading error:",
+            error
+        );
+
+
+        movieList.innerHTML =
+            "<p>Movies load nahi ho rahi.</p>";
+
+    }
+
+}
+
+
+
+// ========================================
+// EDIT MOVIE
+// ========================================
+
+async function editMovie(id) {
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                "/api/movies"
+            );
+
+
+        const movies =
+            await response.json();
+
+
+        const movie =
+            movies.find(
+                item =>
+                    String(item.id) ===
+                    String(id)
+            );
+
+
+        if (!movie) {
+
+
+            alert(
+                "Movie nahi mili."
+            );
+
+
+            return;
+
+        }
+
+
+
+        document
+            .getElementById(
+                "editMovieId"
+            )
+            .value = movie.id;
+
+
+
+        document
+            .getElementById(
+                "editMovieName"
+            )
+            .value =
+                movie.name || "";
+
+
+
+        document
+            .getElementById(
+                "editMovieCategory"
+            )
+            .value =
+                movie.category || "Action";
+
+
+
+        document
+            .getElementById(
+                "editMovieYear"
+            )
+            .value =
+                movie.year || "";
+
+
+
+        document
+            .getElementById(
+                "editMovieDescription"
+            )
+            .value =
+                movie.description || "";
+
+
+
+        document
+            .getElementById(
+                "editMovieBox"
+            )
+            .style.display =
+                "block";
+
+
+
+        document
+            .getElementById(
+                "editMovieBox"
+            )
+            .scrollIntoView({
+                behavior: "smooth"
+            });
+
+
+    } catch (error) {
+
+
+        console.error(error);
+
+
+        alert(
+            "Movie information load nahi hui."
+        );
+
+    }
+
+}
+
+
+
+// ========================================
+// SAVE EDITED MOVIE
+// ========================================
+
+document
+    .getElementById(
+        "editMovieForm"
+    )
+    .addEventListener(
+        "submit",
+        async function(event) {
+
+
+            event.preventDefault();
+
+
+            const id =
+                document
+                    .getElementById(
+                        "editMovieId"
+                    )
+                    .value;
+
+
+            const form =
+                document
+                    .getElementById(
+                        "editMovieForm"
+                    );
+
+
+            const formData =
+                new FormData(form);
+
+
+
+            try {
+
+
+                const response =
+                    await fetch(
+                        "/api/movies/" + id,
+                        {
+                            method: "PUT",
+                            body: formData
+                        }
+                    );
+
+
+                const result =
+                    await response.json();
+
+
+                if (result.success) {
+
+
+                    alert(
+                        "Movie successfully updated! ✏️"
+                    );
+
+
+                    form.reset();
+
+
+                    document
+                        .getElementById(
+                            "editMovieBox"
+                        )
+                        .style.display =
+                            "none";
+
+
+                    loadAdminMovies();
+
+
+                } else {
+
+
+                    alert(
+                        result.message ||
+                        "Movie update nahi hui."
+                    );
+
+                }
+
+
+            } catch (error) {
+
+
+                console.error(error);
+
+
+                alert(
+                    "Server se connection nahi ho raha."
+                );
+
+            }
+
+        }
+    );
+
+
+
+// ========================================
+// CANCEL EDIT
+// ========================================
+
+function cancelEdit() {
+
+
+    document
+        .getElementById(
+            "editMovieBox"
+        )
+        .style.display =
+            "none";
+
+
+    document
+        .getElementById(
+            "editMovieForm"
+        )
+        .reset();
+
+}
+
+
+
+// ========================================
+// DELETE MOVIE
+// ========================================
+
+async function deleteMovie(id) {
+
+
+    const confirmDelete =
+        confirm(
+            "Kya tum ye movie delete karna chahte ho?"
+        );
+
+
+    if (!confirmDelete) {
+
+        return;
+
+    }
+
+
+    try {
+
+
+        const response =
+            await fetch(
+                "/api/movies/" + id,
+                {
+                    method: "DELETE"
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (result.success) {
+
+
+            alert(
+                "Movie successfully deleted! 🗑️"
+            );
+
+
+            loadAdminMovies();
+
+
+        } else {
+
+
+            alert(
+                result.message ||
+                "Movie delete nahi hui."
+            );
+
+        }
+
+
+    } catch (error) {
+
+
+        console.error(error);
+
+
+        alert(
+            "Server se connection nahi ho raha."
+        );
+
+    }
+
+}
+
+
+
+// ========================================
+// START
+// ========================================
+
+loadAdminMovies();
+
+
+</script>
+
+
+</body>
+
+</html>

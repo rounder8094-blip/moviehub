@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MovieHub - Free Movies</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="logo">
+        Movie<span>Hub</span>
+    </div>
+
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="#movies">Movies</a>
+        <a href="#categories">Categories</a>
+        <a href="#about">About</a>
+    </nav>
+
+    <div class="search-box">
+
+        <input
+            type="text"
+            id="searchInput"
+            placeholder="Search movies..."
+        >
+
+        <button
+            id="searchButton"
+            type="button"
+        >
+            🔍
+        </button>
+
+    </div>
+
+</header>
+
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <p class="small-title">
+            WELCOME TO MOVIEHUB
+        </p>
+
+        <h1>
+            Watch Movies<br>
+            For Free
+        </h1>
+
+        <p class="description">
+            Discover legally available movies and other content.
+        </p>
+
+        <button
+            class="watch-btn"
+            onclick="document.getElementById('movies').scrollIntoView()"
+        >
+            ▶ Watch Now
+        </button>
+
+    </div>
+
+</section>
+
+
+<section
+    class="movies-section"
+    id="movies"
+>
+
+    <div class="section-title">
+
+        <h2 id="moviesTitle">
+            Popular Movies
+        </h2>
+
+    </div>
+
+    <div
+        class="movie-grid"
+        id="movieGrid"
+    >
+
+        <p>Loading movies...</p>
+
+    </div>
+
+</section>
+
+
+<section
+    class="categories"
+    id="categories"
+>
+
+    <h2>
+        Browse Categories
+    </h2>
+
+    <div class="category-list">
+
+        <button data-category="Action">
+            Action
+        </button>
+
+        <button data-category="Comedy">
+            Comedy
+        </button>
+
+        <button data-category="Drama">
+            Drama
+        </button>
+
+        <button data-category="Horror">
+            Horror
+        </button>
+
+        <button data-category="Thriller">
+            Thriller
+        </button>
+
+        <button data-category="Sci-Fi">
+            Sci-Fi
+        </button>
+
+        <button data-category="All">
+            All Movies
+        </button>
+
+    </div>
+
+</section>
+
+
+<footer id="about">
+
+    <h2>MovieHub</h2>
+
+    <p>
+        A platform for legally available content.
+    </p>
+
+    <p class="copyright">
+        © 2026 MovieHub. All rights reserved.
+    </p>
+
+</footer>
+
+
+<script>
+
+let allMovies = [];
+
+let currentCategory = "All";
+
+
+// ==============================
+// LOAD MOVIES
+// ==============================
+
+async function loadMovies() {
+
+    const movieGrid =
+        document.getElementById("movieGrid");
+
+    try {
+
+        const response =
+            await fetch("/api/movies");
+
+        if (!response.ok) {
+            throw new Error("API error");
+        }
+
+        const movies =
+            await response.json();
+
+        allMovies = movies;
+
+        displayMovies(allMovies);
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        movieGrid.innerHTML =
+            "<p>Movies load nahi ho rahi.</p>";
+
+    }
+
+}
+
+
+// ==============================
+// DISPLAY MOVIES
+// ==============================
+
+function displayMovies(movies) {
+
+    const movieGrid =
+        document.getElementById("movieGrid");
+
+    movieGrid.innerHTML = "";
+
+
+    if (movies.length === 0) {
+
+        movieGrid.innerHTML =
+            "<p>No movies found.</p>";
+
+        return;
+
+    }
+
+
+    movies.forEach(movie => {
+
+        const card =
+            document.createElement("div");
+
+        card.className =
+            "movie-card";
+
+
+        card.innerHTML = `
+
+            <div class="poster">
+
+                ${
+                    movie.poster
+
+                    ?
+
+                    `<img
+                        src="${movie.poster}"
+                        alt="${movie.name}"
+                    >`
+
+                    :
+
+                    `<div
+                        style="
+                        font-size:60px;
+                        text-align:center;
+                        padding:50px 0;
+                        "
+                    >
+                        🎬
+                    </div>`
+                }
+
+            </div>
+
+            <div class="movie-info">
+
+                <h3>
+                    ${movie.name}
+                </h3>
+
+                <p>
+                    ${movie.category} • ${movie.year}
+                </p>
+
+            </div>
+
+        `;
+
+
+        card.onclick = function() {
+
+            window.location.href =
+                "watch.html?id=" + movie.id;
+
+        };
+
+
+        movieGrid.appendChild(card);
+
+    });
+
+}
+
+
+// ==============================
+// SEARCH + CATEGORY
+// ==============================
+
+function filterMovies() {
+
+    const searchInput =
+        document.getElementById("searchInput");
+
+    const searchText =
+        searchInput.value
+        .trim()
+        .toLowerCase();
+
+
+    let filteredMovies =
+        allMovies;
+
+
+    // SEARCH
+
+    if (searchText !== "") {
+
+        filteredMovies =
+            filteredMovies.filter(movie => {
+
+                return (
+
+                    movie.name
+                    .toLowerCase()
+                    .includes(searchText)
+
+                    ||
+
+                    movie.category
+                    .toLowerCase()
+                    .includes(searchText)
+
+                );
+
+            });
+
+    }
+
+
+    // CATEGORY
+
+    if (currentCategory !== "All") {
+
+        filteredMovies =
+            filteredMovies.filter(movie => {
+
+                return movie.category
+                    .toLowerCase()
+                    ===
+                    currentCategory.toLowerCase();
+
+            });
+
+    }
+
+
+    displayMovies(filteredMovies);
+
+
+    // TITLE
+
+    const title =
+        document.getElementById("moviesTitle");
+
+
+    if (searchText !== "") {
+
+        title.textContent =
+            "Search Results";
+
+    }
+
+    else if (currentCategory !== "All") {
+
+        title.textContent =
+            currentCategory + " Movies";
+
+    }
+
+    else {
+
+        title.textContent =
+            "Popular Movies";
+
+    }
+
+}
+
+
+// ==============================
+// SEARCH BUTTON
+// ==============================
+
+document
+    .getElementById("searchButton")
+    .addEventListener(
+        "click",
+        filterMovies
+    );
+
+
+// ==============================
+// LIVE SEARCH
+// ==============================
+
+document
+    .getElementById("searchInput")
+    .addEventListener(
+        "input",
+        filterMovies
+    );
+
+
+// ==============================
+// CATEGORY BUTTONS
+// ==============================
+
+document
+    .querySelectorAll(
+        ".category-list button"
+    )
+    .forEach(button => {
+
+        button.addEventListener(
+            "click",
+            function() {
+
+                currentCategory =
+                    this.dataset.category;
+
+                filterMovies();
+
+                document
+                    .getElementById("movies")
+                    .scrollIntoView({
+                        behavior: "smooth"
+                    });
+
+            }
+        );
+
+    });
+
+
+// START
+
+loadMovies();
+
+</script>
+
+
+</body>
+
+</html>

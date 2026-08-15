@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MovieHub - Watch</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <div class="logo">
+            Movie<span>Hub</span>
+        </div>
+
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="index.html">Movies</a>
+            <a href="index.html">Categories</a>
+        </nav>
+
+    </header>
+
+
+    <main class="watch-page">
+
+        <div class="back-button">
+            <a href="index.html">← Back to Movies</a>
+        </div>
+
+
+        <!-- MOVIE POSTER -->
+
+        <img
+            id="moviePoster"
+            src=""
+            alt="Movie Poster"
+            style="
+                width:220px;
+                max-width:100%;
+                border-radius:10px;
+                margin:20px 0;
+            "
+        >
+
+
+        <!-- MOVIE TITLE -->
+
+        <h1 id="movieTitle">
+            Loading...
+        </h1>
+
+
+        <!-- MOVIE META -->
+
+        <p
+            class="watch-meta"
+            id="movieMeta"
+        >
+            Loading...
+        </p>
+
+
+        <!-- VIDEO PLAYER -->
+
+        <div class="video-container">
+
+            <video
+                id="moviePlayer"
+                controls
+                preload="metadata"
+                style="width:100%;"
+            >
+
+                Your browser does not support video playback.
+
+            </video>
+
+        </div>
+
+
+        <!-- MOVIE INFORMATION -->
+
+        <section class="movie-details">
+
+            <h2 id="movieDetailsTitle">
+                Loading...
+            </h2>
+
+            <p id="movieDescription">
+                Loading movie description...
+            </p>
+
+            <div class="movie-tags">
+
+                <span id="movieCategory">
+                    Category
+                </span>
+
+                <span id="movieYear">
+                    Year
+                </span>
+
+                <span>
+                    HD
+                </span>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+
+        <h2>MovieHub</h2>
+
+        <p>
+            A free streaming platform for legally available content.
+        </p>
+
+    </footer>
+
+
+    <script>
+
+    async function loadMovie() {
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+        const id =
+            params.get("id");
+
+
+        if (!id) {
+
+            document.getElementById("movieTitle")
+                .innerText = "Movie not found";
+
+            return;
+
+        }
+
+
+        try {
+
+            const response =
+                await fetch("/api/movies");
+
+            const movies =
+                await response.json();
+
+
+            const movie =
+                movies.find(
+                    m => m.id === id
+                );
+
+
+            if (!movie) {
+
+                document.getElementById("movieTitle")
+                    .innerText = "Movie not found";
+
+                return;
+
+            }
+
+
+            /* POSTER */
+
+            document.getElementById("moviePoster")
+                .src = movie.poster;
+
+
+            /* TITLE */
+
+            document.getElementById("movieTitle")
+                .innerText = movie.name;
+
+
+            document.getElementById("movieDetailsTitle")
+                .innerText = movie.name;
+
+
+            /* CATEGORY + YEAR */
+
+            document.getElementById("movieMeta")
+                .innerText =
+                movie.category +
+                " • " +
+                movie.year +
+                " • HD";
+
+
+            document.getElementById("movieCategory")
+                .innerText =
+                movie.category;
+
+
+            document.getElementById("movieYear")
+                .innerText =
+                movie.year;
+
+
+            /* DESCRIPTION */
+
+            document.getElementById("movieDescription")
+                .innerText =
+                movie.description;
+
+
+            /* VIDEO */
+
+            document.getElementById("moviePlayer")
+                .src = movie.video;
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            document.getElementById("movieTitle")
+                .innerText =
+                "Movie load nahi ho rahi.";
+
+        }
+
+    }
+
+
+    loadMovie();
+
+    </script>
+
+</body>
+
+</html>
