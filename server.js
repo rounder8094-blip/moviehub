@@ -3,7 +3,16 @@ const fs = require("fs");
 const path = require("path");
 const multer = require("multer");
 const session = require("express-session");
+const cloudinary = require("cloudinary").v2;
+// ========================================
+// CLOUDINARY
+// ========================================
 
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -400,26 +409,29 @@ app.get(
 // ADMIN ONLY
 // ========================================
 
+// ========================================
+// ADD MOVIE
+// ADMIN ONLY
+// CLOUDINARY UPLOAD
+// ========================================
+
 app.post(
     "/api/movies",
 
     requireAdmin,
 
     upload.fields([
-
         {
             name: "poster",
             maxCount: 1
         },
-
         {
             name: "video",
             maxCount: 1
         }
-
     ]),
 
-    (req, res) => {
+    async (req, res) => {
 
         try {
 
@@ -431,6 +443,8 @@ app.post(
                     )
                 );
 
+
+            // CHECK POSTER
 
             if (
                 !req.files ||
@@ -450,6 +464,8 @@ app.post(
             }
 
 
+            // CHECK VIDEO
+
             if (
                 !req.files.video ||
                 !req.files.video[0]
@@ -467,12 +483,45 @@ app.post(
             }
 
 
-            const poster =
+            const posterFile =
                 req.files.poster[0];
 
-            const video =
+            const videoFile =
                 req.files.video[0];
 
+
+            // ========================================
+            // UPLOAD POSTER TO CLOUDINARY
+            // ========================================
+
+            const posterResult =
+                await cloudinary.uploader.upload(
+                    posterFile.path,
+                    {
+                        folder: "moviehub/posters",
+                        resource_type: "image"
+                    }
+                );
+
+
+            // ========================================
+            // UPLOAD VIDEO TO CLOUDINARY
+            // ========================================
+
+            const videoResult =
+                await cloudinary.uploader.upload_large(
+                    videoFile.path,
+                    {
+                        folder: "moviehub/videos",
+                        resource_type: "video",
+                        chunk_size: 6000000
+                    }
+                );
+
+
+            // ========================================
+            // CREATE MOVIE
+            // ========================================
 
             const movie = {
 
@@ -492,18 +541,20 @@ app.post(
                     req.body.description || "",
 
                 poster:
-                    "/posters/" +
-                    poster.filename,
+                    posterResult.secure_url,
 
                 video:
-                    "/videos/" +
-                    video.filename
+                    videoResult.secure_url
 
             };
 
 
+            // ADD MOVIE
+
             movies.push(movie);
 
+
+            // SAVE JSON
 
             fs.writeFileSync(
 
@@ -518,8 +569,48 @@ app.post(
             );
 
 
+            // DELETE TEMPORARY LOCAL FILES
+
+            try {
+
+                if (
+                    fs.existsSync(
+                        posterFile.path
+                    )
+                ) {
+
+                    fs.unlinkSync(
+                        posterFile.path
+                    );
+
+                }
+
+                if (
+                    fs.existsSync(
+                        videoFile.path
+                    )
+                ) {
+
+                    fs.unlinkSync(
+                        videoFile.path
+                    );
+
+                }
+
+            }
+
+            catch (cleanupError) {
+
+                console.log(
+                    "Temporary file cleanup warning:",
+                    cleanupError.message
+                );
+
+            }
+
+
             console.log(
-                "Movie added:",
+                "Movie added to Cloudinary:",
                 movie.name
             );
 
@@ -529,7 +620,7 @@ app.post(
                 success: true,
 
                 message:
-                    "Movie successfully added!",
+                    "Movie successfully uploaded!",
 
                 movie:
                     movie
@@ -541,7 +632,7 @@ app.post(
         catch (error) {
 
             console.error(
-                "ADD MOVIE ERROR:",
+                "CLOUDINARY UPLOAD ERROR:",
                 error
             );
 
@@ -559,7 +650,6 @@ app.post(
 
     }
 );
-
 
 // ========================================
 // EDIT MOVIE
