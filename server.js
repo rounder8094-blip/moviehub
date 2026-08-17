@@ -166,96 +166,9 @@ app.get(
 // MULTER
 // ========================================
 
-const storage =
-    multer.diskStorage({
-
-        destination: function(
-            req,
-            file,
-            cb
-        ) {
-
-            if (
-                file.fieldname === "poster"
-            ) {
-
-                cb(
-                    null,
-                    postersFolder
-                );
-
-            }
-
-            else if (
-                file.fieldname === "video"
-            ) {
-
-                cb(
-                    null,
-                    videosFolder
-                );
-
-            }
-
-            else {
-
-                cb(
-                    new Error(
-                        "Invalid file field"
-                    )
-                );
-
-            }
-
-        },
-
-destination: function(
-    req,
-    file,
-    cb
-) {
-
-    cb(
-        null,
-        os.tmpdir()
-    );
-
-},
-        filename: function(
-            req,
-            file,
-            cb
-        ) {
-
-            const extension =
-                path.extname(
-                    file.originalname
-                );
-
-
-            const filename =
-                Date.now() +
-                "-" +
-                Math.round(
-                    Math.random() * 100000
-                ) +
-                extension;
-
-
-            cb(
-                null,
-                filename
-            );
-
-        }
-
-    });
-
-
-const upload =
-    multer({
-        storage: storage
-    });
+const upload = multer({
+    storage: multer.memoryStorage()
+});
 
 
 // ========================================
@@ -506,29 +419,48 @@ app.post(
             // UPLOAD POSTER TO CLOUDINARY
             // ========================================
 
-            const posterResult =
-                await cloudinary.uploader.upload(
-                    posterFile.path,
-                    {
-                        folder: "moviehub/posters",
-                        resource_type: "image"
-                    }
-                );
+            const posterResult = await new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+        {
+            folder: "moviehub/posters",
+            resource_type: "image"
+        },
+        (error, result) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(result);
+            }
+        }
+    );
+
+    stream.end(posterFile.buffer);
+});
+
 
 
             // ========================================
             // UPLOAD VIDEO TO CLOUDINARY
             // ========================================
 
-            const videoResult =
-                await cloudinary.uploader.upload_large(
-                    videoFile.path,
-                    {
-                        folder: "moviehub/videos",
-                        resource_type: "video",
-                        chunk_size: 6000000
-                    }
-                );
+            const videoResult = await new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_chunked_stream(
+        {
+            folder: "moviehub/videos",
+            resource_type: "video",
+            chunk_size: 6000000
+        },
+        (error, result) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(result);
+            }
+        }
+    );
+
+    stream.end(videoFile.buffer);
+});
 
 
             // ========================================
@@ -583,33 +515,7 @@ app.post(
 
             // DELETE TEMPORARY LOCAL FILES
 
-            try {
-
-                if (
-                    fs.existsSync(
-                        posterFile.path
-                    )
-                ) {
-
-                    fs.unlinkSync(
-                        posterFile.path
-                    );
-
-                }
-
-                if (
-                    fs.existsSync(
-                        videoFile.path
-                    )
-                ) {
-
-                    fs.unlinkSync(
-                        videoFile.path
-                    );
-
-                }
-
-            }
+    
 
             catch (cleanupError) {
 
