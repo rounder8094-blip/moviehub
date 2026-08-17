@@ -4,6 +4,7 @@ const path = require("path");
 const multer = require("multer");
 const session = require("express-session");
 const cloudinary = require("cloudinary").v2;
+const os = require("os");
 // ========================================
 // CLOUDINARY
 // ========================================
@@ -208,7 +209,18 @@ const storage =
 
         },
 
+destination: function(
+    req,
+    file,
+    cb
+) {
 
+    cb(
+        null,
+        os.tmpdir()
+    );
+
+},
         filename: function(
             req,
             file,
