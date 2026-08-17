@@ -515,17 +515,6 @@ app.post(
 
             // DELETE TEMPORARY LOCAL FILES
 
-    
-
-            catch (cleanupError) {
-
-                console.log(
-                    "Temporary file cleanup warning:",
-                    cleanupError.message
-                );
-
-            }
-
 
             console.log(
                 "Movie added to Cloudinary:",
