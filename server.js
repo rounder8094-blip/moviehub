@@ -4,7 +4,6 @@ const path = require("path");
 const multer = require("multer");
 const session = require("express-session");
 const cloudinary = require("cloudinary").v2;
-const os = require("os");
 // ========================================
 // CLOUDINARY
 // ========================================
@@ -32,7 +31,7 @@ const ADMIN_PASSWORD = "701427";
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(__dirname));
+
 
 // ========================================
 // SESSION
@@ -161,14 +160,90 @@ app.get(
     }
 );
 
-
+app.use(express.static(__dirname));
 // ========================================
 // MULTER
 // ========================================
 
-const upload = multer({
-    storage: multer.memoryStorage()
-});
+const storage =
+    multer.diskStorage({
+
+        destination: function(
+            req,
+            file,
+            cb
+        ) {
+
+            if (
+                file.fieldname === "poster"
+            ) {
+
+                cb(
+                    null,
+                    postersFolder
+                );
+
+            }
+
+            else if (
+                file.fieldname === "video"
+            ) {
+
+                cb(
+                    null,
+                    videosFolder
+                );
+
+            }
+
+            else {
+
+                cb(
+                    new Error(
+                        "Invalid file field"
+                    )
+                );
+
+            }
+
+        },
+
+
+        filename: function(
+            req,
+            file,
+            cb
+        ) {
+
+            const extension =
+                path.extname(
+                    file.originalname
+                );
+
+
+            const filename =
+                Date.now() +
+                "-" +
+                Math.round(
+                    Math.random() * 100000
+                ) +
+                extension;
+
+
+            cb(
+                null,
+                filename
+            );
+
+        }
+
+    });
+
+
+const upload =
+    multer({
+        storage: storage
+    });
 
 
 // ========================================
@@ -419,48 +494,29 @@ app.post(
             // UPLOAD POSTER TO CLOUDINARY
             // ========================================
 
-            const posterResult = await new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
-        {
-            folder: "moviehub/posters",
-            resource_type: "image"
-        },
-        (error, result) => {
-            if (error) {
-                reject(error);
-            } else {
-                resolve(result);
-            }
-        }
-    );
-
-    stream.end(posterFile.buffer);
-});
-
+            const posterResult =
+                await cloudinary.uploader.upload(
+                    posterFile.path,
+                    {
+                        folder: "moviehub/posters",
+                        resource_type: "image"
+                    }
+                );
 
 
             // ========================================
             // UPLOAD VIDEO TO CLOUDINARY
             // ========================================
 
-            const videoResult = await new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_chunked_stream(
-        {
-            folder: "moviehub/videos",
-            resource_type: "video",
-            chunk_size: 6000000
-        },
-        (error, result) => {
-            if (error) {
-                reject(error);
-            } else {
-                resolve(result);
-            }
-        }
-    );
-
-    stream.end(videoFile.buffer);
-});
+            const videoResult =
+                await cloudinary.uploader.upload_large(
+                    videoFile.path,
+                    {
+                        folder: "moviehub/videos",
+                        resource_type: "video",
+                        chunk_size: 6000000
+                    }
+                );
 
 
             // ========================================
@@ -514,6 +570,43 @@ app.post(
 
 
             // DELETE TEMPORARY LOCAL FILES
+
+            try {
+
+                if (
+                    fs.existsSync(
+                        posterFile.path
+                    )
+                ) {
+
+                    fs.unlinkSync(
+                        posterFile.path
+                    );
+
+                }
+
+                if (
+                    fs.existsSync(
+                        videoFile.path
+                    )
+                ) {
+
+                    fs.unlinkSync(
+                        videoFile.path
+                    );
+
+                }
+
+            }
+
+            catch (cleanupError) {
+
+                console.log(
+                    "Temporary file cleanup warning:",
+                    cleanupError.message
+                );
+
+            }
 
 
             console.log(
